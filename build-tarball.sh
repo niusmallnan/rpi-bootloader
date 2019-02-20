@@ -2,28 +2,20 @@
 set -e
 set -x
 
+VERSION=$(cat /version)
+
 # Create target dir for build artefacts
 WORKDIR=$PWD
-BUILD_NR=${BUILD_NR:=$(date '+%Y%m%d-%H%M%S')}
-if [ "$TIMESTAMP_OUTPUT" == "true" ]; then
-  BUILD_DEST=/builds/$BUILD_NR
-else
-  BUILD_DEST=/builds
-fi
+BUILD_DEST=/builds/$VERSION
 mkdir -p $BUILD_DEST
 
 # Clone the upstream GH repo
-BRANCH=master
-if [[ -d $FIRMWARE ]]; then
-  # update repo
-  cd $FIRMWARE
-  git pull
-  git checkout $BRANCH
-else
-  # clone repo
-  git clone --single-branch --branch $BRANCH --depth 1 $FIRMWARE_REPO $FIRMWARE
-  cd $FIRMWARE
-fi
+rm -rf $FIRMWARE
+BRANCH=stable
+COMMIT=98997f363e3683ead4f50c37902169248628303a
+git clone --single-branch --branch $BRANCH --depth 1 $FIRMWARE_REPO $FIRMWARE
+cd $FIRMWARE
+git checkout -q $COMMIT
 
 # Create tar file
 TARFILE=rpi-bootloader.tar.gz
@@ -32,6 +24,7 @@ boot/LICENCE.*
 boot/bootcode.bin
 boot/fixup*.dat
 boot/start*.elf
+boot/COPYING.linux
 "
 tar -cvzf $WORKDIR/$TARFILE $FILELIST
 cd $WORKDIR

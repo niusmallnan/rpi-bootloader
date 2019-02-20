@@ -2,11 +2,10 @@ FROM alpine:3.7
 
 WORKDIR /workdir
 ENV FIRMWARE=/workdir/raspberry-firmware \
-    FIRMWARE_REPO=https://www.github.com/raspberrypi/firmware \
-    TIMESTAMP_OUTPUT=true
+    FIRMWARE_REPO=https://www.github.com/raspberrypi/firmware
 
 # Install build dependencies
 RUN apk add --no-cache bash git
 
-COPY build-tarball.sh /
+COPY *.sh version /
 CMD ["/build-tarball.sh"]
